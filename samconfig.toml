@@ -1,0 +1,8 @@
+version=0.1
+[default.deploy.parameters]
+ stack_name = "stroll-backend-stack"
+ s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ejuw7udvcm1n"
+ region = "us-west-1"
+ confirm_changeset = true
+ capabilities = "CAPABILITY_IAM"
+ s3_prefix = "stroll-backend-stack"
