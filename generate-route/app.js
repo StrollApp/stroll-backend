@@ -18,25 +18,23 @@ exports.lambdaHandler = async (event, context) => {
   try {
     // extract start point, end point, and safety params
     const query = JSON.parse(event.body);
-    var { start, end } = query.points;
+    const { start, end } = query.points;
     const safetyParams = query.safetyParams;
 
     // solve for route
     var waypoints = [];
 
-    // generate return reoute
+    // generate return route
     const route = {
       start,
-      waypoints: waypoints,
+      waypoints,
       end
     };
 
     // generate response object
     response = {
       statusCode: 200,
-      body: {
-        route
-      }
+      body: JSON.stringify({ route })
     };
   } catch (err) {
     console.log(err);
