@@ -31,11 +31,11 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
       Events:
-        HelloWorld:
+        GenerateRoute:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /generate-route
-            Method: get
+            Method: post
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
