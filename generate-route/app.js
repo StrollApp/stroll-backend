@@ -2,6 +2,9 @@
 // const url = 'http://checkip.amazonaws.com/';
 let response;
 
+const findClosesNodeToPoint = require("./helper/findClosestNodeToPoint");
+const findPathBetweenNodes = require("./helper/findPathBetweenNodes");
+
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -22,12 +25,14 @@ exports.lambdaHandler = async (event, context) => {
     const safetyParams = query.safetyParams;
 
     // solve for route
-    var waypoints = [];
+    const startNode = findClosesNodeToPoint(start);
+    const endNode = findClosesNodeToPoint(end);
+    const path = findPathBetweenNodes(startNode, endNode);
 
     // generate return route
     const route = {
       start,
-      waypoints,
+      waypoints: path,
       end
     };
 

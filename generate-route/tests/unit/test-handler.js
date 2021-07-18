@@ -4,7 +4,7 @@ const app = require("../../app.js");
 const chai = require("chai");
 const expect = chai.expect;
 
-const googleMapsLinkGenerator = require("../../helper/googleMapsLinkGenerator");
+const getRouteURL = require("../../helper/googleMapsLinkGenerator");
 
 describe("query to /generate-route lambda function", function () {
   it("should return valid response on valid input", async () => {
@@ -49,7 +49,7 @@ describe("query to /generate-route lambda function", function () {
         expect(point.latitude).to.be.an("number");
     });
 
-    const link = googleMapsLinkGenerator(start, waypoints, end);
+    const link = getRouteURL(start, waypoints, end);
     console.log(
       `   The result can be inspected with the following Google Maps link ${link}`
     );
