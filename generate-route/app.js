@@ -25,9 +25,10 @@ exports.lambdaHandler = async (event, context) => {
     const safetyParams = query.safetyParams;
 
     // solve for route
-    const startNode = findClosesNodeToPoint(start);
-    const endNode = findClosesNodeToPoint(end);
-    const path = findPathBetweenNodes(startNode, endNode);
+    const graph = {}; // dummy variable for pointer to graph
+    const startNode = findClosesNodeToPoint(graph, start);
+    const endNode = findClosesNodeToPoint(graph, end);
+    const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
 
     // generate return route
     const route = {
