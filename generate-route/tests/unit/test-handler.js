@@ -43,10 +43,10 @@ describe("query to /generate-route lambda function", function () {
 
     const points = [start, ...waypoints, end];
     points.forEach(point => {
-        expect(point).to.have.property("longitude");
-        expect(point).to.have.property("latitude");
-        expect(point.longitude).to.be.an("number");
-        expect(point.latitude).to.be.an("number");
+      expect(point).to.have.property("longitude");
+      expect(point).to.have.property("latitude");
+      expect(point.longitude).to.be.an("number");
+      expect(point.latitude).to.be.an("number");
     });
 
     const link = getRouteURL(start, waypoints, end);
