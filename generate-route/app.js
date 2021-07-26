@@ -58,7 +58,7 @@ exports.lambdaHandler = async (event, context) => {
 */
 
 // budu test
-    const path = findPathBetweenNodes(graph, 0, 1, safetyParams);
+    const path = findPathBetweenNodes(graph, 5088, 5093, safetyParams);
 
     // generate return route
     const route = {

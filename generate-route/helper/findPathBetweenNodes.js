@@ -88,7 +88,6 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   while(!pq.isEmpty()) {
 
     currNode = pq.pop()[0];
-    console.log(nodes[currNode]);
 
     if(currNode === endNode) {
       break;
@@ -99,6 +98,10 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
     nodes[currNode].visited = true;
 
+    //console.log(nodes[currNode].adjacencies);
+    if(typeof(nodes[currNode].adjacencies) === 'number') {
+      nodes[currNode].adjacencies = nodes[currNode].adjacencies.toString();
+    }
     let adj = nodes[currNode].adjacencies.split('-')
     adj = adj.map(Number)
     for(var i=0; i<adj.length; i++) {
@@ -110,13 +113,12 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
       currW = edgeScore(edges[neighborEdge], safetyParams);
       if(nodes[neighbor].g === undefined || nodes[currNode].g + currW < nodes[neighbor].g) {
         nodes[neighbor].g = nodes[currNode].g + currW;
-        pq.push(neighbor, nodes[neighbor].g + heuristic(nodes[neighbor], nodes[endNode]));
+        pq.push([neighbor, nodes[neighbor].g + heuristic(nodes[neighbor], nodes[endNode])]);
         nodes[neighbor].prev = currNode; // prev stores index in array seems fine
       }
 
     }
 
-    console.log("ohuh")
   }
 
   // now construct the list of waypoints

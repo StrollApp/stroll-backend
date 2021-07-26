@@ -12,13 +12,23 @@ describe("query to /generate-route lambda function", function () {
     const query = {
       body: JSON.stringify({
         points: {
-          start: {
+          // original unit test:
+          /*start: {
             longitude: -122.26100921630858,
             latitude: 37.86726491715302
           },
           end: {
             longitude: -122.26530075073242,
             latitude: 37.86997517701081
+          }*/
+          // budu unit test:
+          start: {
+            longitude: -122.2758966,
+            latitude: 37.8846723
+          },
+          end: {
+            longitude: -122.2825912,
+            latitude: 37.8888831
           }
         },
         safetyParams: ["crime", "streetLights"]
