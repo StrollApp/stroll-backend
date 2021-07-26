@@ -2,8 +2,13 @@
 // const url = 'http://checkip.amazonaws.com/';
 let response;
 
-const findClosesNodeToPoint = require("./helper/findClosestNodeToPoint");
+const findClosestNodeToPoint = require("./helper/findClosestNodeToPoint");
 const findPathBetweenNodes = require("./helper/findPathBetweenNodes");
+
+// budu's testing stuff
+const edgeArray = require("./edges.json");
+const nodeArray = require("./nodes.json");
+//
 
 /**
  *
@@ -25,10 +30,35 @@ exports.lambdaHandler = async (event, context) => {
     const safetyParams = query.safetyParams;
 
     // solve for route
-    const graph = {}; // dummy variable for pointer to graph
-    const startNode = findClosesNodeToPoint(graph, start);
-    const endNode = findClosesNodeToPoint(graph, end);
+    const graph = {
+      edges: edgeArray,
+      nodes: nodeArray
+    }; // dummy variable for pointer to graph
+    // i guess i want this to contain an array of edge objects and an array of node objects
+    /* 
+    {
+      edges: []
+      nodes: []
+    }
+    and a node is like
+    {
+      index: 
+      id: 
+      lat: 
+      long: 
+      adjacencies: []
+    }
+    */
+    // with property names as specified in csv file
+    // except any list separated with - should just be an array ig
+/*
+    const startNode = findClosestNodeToPoint(graph, start); // this should return an index...
+    const endNode = findClosestNodeToPoint(graph, end);
     const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
+*/
+
+// budu test
+    const path = findPathBetweenNodes(graph, 0, 1, safetyParams);
 
     // generate return route
     const route = {
