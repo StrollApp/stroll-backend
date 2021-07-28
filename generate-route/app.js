@@ -5,10 +5,9 @@ let response;
 const findClosestNodeToPoint = require("./helper/findClosestNodeToPoint");
 const findPathBetweenNodes = require("./helper/findPathBetweenNodes");
 
-// budu's testing stuff
+// import graph data
 const edgeArray = require("./edges.json");
 const nodeArray = require("./nodes.json");
-//
 
 /**
  *
@@ -33,25 +32,23 @@ exports.lambdaHandler = async (event, context) => {
     const graph = {
       edges: edgeArray,
       nodes: nodeArray
-    }; // dummy variable for pointer to graph
-    // i guess i want this to contain an array of edge objects and an array of node objects
-    /* 
+    };
+    /* contains an array of edge objects and an array of node objects
     {
       edges: []
       nodes: []
     }
-    and a node is like
+    and a node is of the form
     {
       index: 
       id: 
       lat: 
       long: 
-      adjacencies: []
+      adjacencies: 
     }
+    (and similar for edges)
     */
-    // with property names as specified in csv file
-    // except any list separated with - should just be an array ig
-/*
+/* after findClosestNodeToPoint is done use this:
     const startNode = findClosestNodeToPoint(graph, start); // this should return an index...
     const endNode = findClosestNodeToPoint(graph, end);
     const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
