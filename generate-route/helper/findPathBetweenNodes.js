@@ -16,13 +16,23 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   // TODO: remove unecessary waypoints (>=3 forming a very straight segment)
 
   const pq = new PriorityQueue((a,b) => a[1] < b[1]); // push stuff as [node object INDEX (in the array), priority]
-  nodes = graph.nodes.slice();
-  edges = graph.edges.slice();
+  const nodes = graph.nodes.slice();
+  const edges = graph.edges.slice();
+
+  // make arrays to store visited and g
+  const visited = new Array(nodes.length);
+  const g = new Array(nodes.length);
+  var it = 0;
+  while(it < nodes.length) {
+    visited[it] = false;
+    g[it] = undefined;
+    it++;
+  }
 
   // g = cost, h = heuristic, f = g+h
 
   pq.push([startNode, 0]);
-  nodes[startNode].g = 0;
+  g[startNode] = 0;
 
   while(!pq.isEmpty()) {
 
@@ -31,11 +41,11 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
     if(currNode === endNode) {
       break;
     }
-    else if (nodes[currNode].visited !== undefined) {
+    else if (visited[currNode] === true) {
       continue;
     }
 
-    nodes[currNode].visited = true;
+    visited[currNode] = true;
 
     //console.log(nodes[currNode].adjacencies);
     if(typeof(nodes[currNode].adjacencies) === 'number') {
@@ -50,9 +60,9 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
       neighbor = nodes.findIndex(element => element.id === neighborId);
 
       currW = edgeScore(edges[neighborEdge], safetyParams);
-      if(nodes[neighbor].g === undefined || nodes[currNode].g + currW < nodes[neighbor].g) {
-        nodes[neighbor].g = nodes[currNode].g + currW;
-        pq.push([neighbor, nodes[neighbor].g + heuristic(nodes[neighbor], nodes[endNode])]);
+      if(g[neighbor] === undefined || g[currNode] + currW < g[neighbor]) {
+        g[neighbor] = g[currNode] + currW;
+        pq.push([neighbor, g[neighbor] + heuristic(nodes[neighbor], nodes[endNode])]);
         nodes[neighbor].prev = currNode; // prev stores index in array seems fine
       }
 
@@ -62,7 +72,7 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
   // now construct the list of waypoints
   let path = []
-  if (nodes[endNode].g === undefined) {
+  if (g[endNode] === undefined) {
     // this is either because start === end or there is no path
     // TODO: what to do if there is no path (can this even happen)
   }
@@ -91,7 +101,7 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
   return {
     path: path,
-    dist: nodes[endNode].g
+    dist: g[endNode]
   };
 };
 
@@ -113,7 +123,7 @@ function heuristic(node, end) { // given as node object; computes euclidean dist
   return Math.sqrt(latD * latD + lonD * lonD);
 }
 
-function removeUnnecessary(path, start, end) { // array of waypoints + start and end coordinates
+function removeUnnecessary(path) { // array of waypoints + start and end coordinates
   const ANG = 1 * Math.PI / 180; // maximum amt of degrees which we consider "straight line"
   let fullPath = path.slice();
   let i = 1;
