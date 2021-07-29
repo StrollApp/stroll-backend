@@ -4,6 +4,7 @@
 // return the path, including the start and end points
 
 var PriorityQueue = require("./priorityQueue.js");
+const edgeScore = require("./edgeScore.js");
 
 module.exports = function (graph, startNode, endNode, safetyParams) {
   // this assumes startnode and endnode are indices for the node array in the graph
@@ -60,40 +61,39 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   }
 
   // now construct the list of waypoints
-  const path = []
+  let path = []
   if (nodes[endNode].g === undefined) {
     // this is either because start === end or there is no path
+    // TODO: what to do if there is no path (can this even happen)
   }
   else {
     curr = endNode;
-    while(nodes[curr].prev !== startNode) {
-      prev = nodes[curr].prev;
+    while(curr !== startNode) {
       path.push({
-        latitude: nodes[prev].latitude,
-        longitude: nodes[prev].longitude
+        latitude: nodes[curr].latitude,
+        longitude: nodes[curr].longitude
       });
-      curr = prev;
+      curr = nodes[curr].prev;
     }
+    path.push({
+      latitude: nodes[startNode].latitude,
+      longitude: nodes[startNode].longitude
+    })
     path.reverse();
   }
 
-/* testing heuristic
-  node = {
-    latitude: 37.862638,
-    longitude: -122.2440254
-  };
-  end = {
-    latitude: 37.8627683,
-    longitude: -122.2441072
-  };
-  console.log(heuristic(node, end));*/
+  if(path.length > 0) { // need to remove some waypoints
+    path = removeUnnecessary(path);
+    if(path.length > 23) {
+      // TODO: ?
+    }
+  }
 
-  return path;
+  return {
+    path: path,
+    dist: nodes[endNode].g
+  };
 };
-
-function edgeScore(edge, safetyParams) { // edge is an edge object, safetyparam is array of strings
-  return edge.distance;
-}
 
 function heuristic(node, end) { // given as node object; computes euclidean distance
   s_lat = 37.84369; n_lat = 37.91079;
@@ -111,4 +111,36 @@ function heuristic(node, end) { // given as node object; computes euclidean dist
   latD = (end_lat - start_lat) * degree * ftPerMile;
   lonD = (end_lon - start_lon) * cos * degree * ftPerMile;
   return Math.sqrt(latD * latD + lonD * lonD);
+}
+
+function removeUnnecessary(path, start, end) { // array of waypoints + start and end coordinates
+  const ANG = 1 * Math.PI / 180; // maximum amt of degrees which we consider "straight line"
+  let fullPath = path.slice();
+  let i = 1;
+  while(i < fullPath.length - 1){
+    // check if i-1, i, i+1 form a straight enough line
+    const a = {
+      x: fullPath[i].latitude - fullPath[i-1].latitude,
+      y: fullPath[i].longitude - fullPath[i-1].longitude
+    };
+    const b = {
+      x: fullPath[i].latitude - fullPath[i+1].latitude,
+      y: fullPath[i].longitude - fullPath[i+1].longitude
+    };
+    const dotProd = a.x * b.x + a.y * b.y;
+    const distA = Math.sqrt(a.x * a.x + a.y * a.y);
+    const distB = Math.sqrt(b.x * b.x + b.y * b.y);
+    let currAng = Math.acos((dotProd)/(distA * distB));
+    if(currAng > Math.PI/2) currAng = Math.PI - currAng;
+    //console.log(currAng * 180 / Math.PI);
+    if(currAng <= ANG){
+      // remove node i from the array
+      fullPath.splice(i, 1);
+      // don't increment i
+    }
+    else{
+      i++;
+    }
+  }
+  return fullPath;
 }

@@ -23,12 +23,12 @@ describe("query to /generate-route lambda function", function () {
           }*/
           // budu unit test:
           start: {
-            longitude: -122.2758966,
-            latitude: 37.8846723
+            longitude: -122.2759143292285,
+            latitude: 37.884688478564016,
           },
           end: {
-            longitude: -122.2825912,
-            latitude: 37.8888831
+            longitude: -122.28257650112171,
+            latitude: 37.88888613298019
           }
         },
         safetyParams: ["crime", "streetLights"]
