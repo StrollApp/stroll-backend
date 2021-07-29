@@ -54,8 +54,8 @@ function findSquareDistanceToEdge(point, edge) {
 
 function findDistanceToCoords(point, lat, lon) {
     const cos = 0.789328039;
-    var point_lat = point.lat;
-    var point_lon = point.lon;
+    var point_lat = point.latitude;
+    var point_lon = point.longitude;
     point_lon *= cos;
     lon *= cos;
     return Math.sqrt((lat - point_lat) * (lat - point_lat) + (lon - point_lon) * (lon - point_lon));

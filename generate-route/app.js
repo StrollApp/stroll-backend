@@ -69,17 +69,12 @@ exports.lambdaHandler = async (event, context) => {
     const result01 = findPathBetweenNodes(graph, startNode0, endNode1, safetyParams);
     const result10 = findPathBetweenNodes(graph, startNode1, endNode0, safetyParams);
     const result11 = findPathBetweenNodes(graph, startNode1, endNode1, safetyParams);
-    console.log(result00.dist)
-    console.log(result01.dist)
-    console.log(result10.dist)
-    console.log(result11.dist)
     const dists = [
       startEdgeDist * startLocation + result00.dist + endEdgeDist * endLocation, 
       startEdgeDist * startLocation + result01.dist + endEdgeDist * (1 - endLocation), 
       startEdgeDist * (1 - startLocation) + result10.dist + endEdgeDist * endLocation, 
       startEdgeDist * (1 - startLocation) + result11.dist + endEdgeDist * (1 - endLocation)
     ];
-    console.log(dists)
     var index = 0;
     var min = Number.MAX_VALUE;
     for (var i = 0; i < 4; i++) {
@@ -88,8 +83,6 @@ exports.lambdaHandler = async (event, context) => {
         index = i;
       }
     }
-    // console.log(index)
-    index = 2;
 
     var path;
     if (index === 0) {
