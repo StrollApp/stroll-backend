@@ -2,7 +2,7 @@
 // const url = 'http://checkip.amazonaws.com/';
 let response;
 
-const findClosestNodeToPoint = require("./helper/findClosestNodeToPoint");
+const findClosestEdgeToPoint = require("./helper/findClosestEdgeToPoint");
 const findPathBetweenNodes = require("./helper/findPathBetweenNodes");
 
 // import graph data
@@ -48,9 +48,10 @@ exports.lambdaHandler = async (event, context) => {
     }
     (and similar for edges)
     */
-/* after findClosestNodeToPoint is done use this:
-    const startNode = findClosestNodeToPoint(graph, start); // this should return an index...
-    const endNode = findClosestNodeToPoint(graph, end);
+/* after findClosestEdgeToPoint is done use this:
+    const startEdge = findClosestEdgeToPoint(graph, start); // this should return an index...
+    const endEdge = findClosestEdgeToPoint(graph, end);
+    // look at each endpoint on edge and find closest paths
     const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
 */
 
