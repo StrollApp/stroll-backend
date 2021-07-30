@@ -37,12 +37,13 @@ const testQuery = async query => {
     ` The original route would have been https://www.google.com/maps/dir/${start.latitude},${start.longitude}/${end.latitude},${end.longitude}/data=!4m2!4m1!3e2`
   );
   console.log(
-    `   The result can be inspected with the following Google Maps link ${link}\n\n\n`
+    `   The result has ${waypoints.length} waypoints and can be inspected with the following Google Maps link ${link}\n\n\n`
   );
 };
 
 describe("query to /generate-route lambda function", function () {
   it("1) should return valid response on query", async () => {
+    return;
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
@@ -64,6 +65,7 @@ describe("query to /generate-route lambda function", function () {
   });
 
   it("2) should return valid response on query", async () => {
+    return;
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
@@ -160,6 +162,27 @@ describe("query to /generate-route lambda function", function () {
           end: {
             latitude: 37.84910360472934,
             longitude: -122.27105140686035
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("7) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          // peoples park test
+          start: {
+            latitude: 37.84926456884684,
+            longitude: -122.29658603668211
+          },
+          end: {
+            latitude: 37.90206723405876,
+            longitude: -122.26727485656738
           }
         },
         safetyParams: ["crime", "streetLights"]
