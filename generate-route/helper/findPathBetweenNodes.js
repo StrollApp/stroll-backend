@@ -1,11 +1,12 @@
 // given the graph, a start, an end point (each with a longitude and latitude property), and
-// a string array of safetyParams find a path that get you from one to the other in the safest 
+// a string array of safetyParams find a path that get you from one to the other in the safest
 // manner
 // return the path, including the start and end points
 
 var PriorityQueue = require("./priorityQueue.js");
 const edgeScore = require("./edgeScore.js");
-const ANG = 5 * Math.PI / 180; // maximum amt of degrees which we consider "straight line"
+const nodeIdToIndex = require("../nodeIdToIndex.json");
+const ANG = (5 * Math.PI) / 180; // maximum amt of degrees which we consider "straight line"
 const cos = 0.789328039;
 const degree = 69.1694444;
 const ftPerMile = 5280;
@@ -19,7 +20,7 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   // TODO: implement edgeScore; need to make sure lights dont make things negative or < 1 even
   // TODO: remove unecessary waypoints (>=3 forming a very straight segment)
 
-  const pq = new PriorityQueue((a,b) => a[1] < b[1]); // push stuff as [node object INDEX (in the array), priority]
+  const pq = new PriorityQueue((a, b) => a[1] < b[1]); // push stuff as [node object INDEX (in the array), priority]
   const nodes = graph.nodes.slice();
   const edges = graph.edges.slice();
 
@@ -27,7 +28,7 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   const visited = new Array(nodes.length);
   const g = new Array(nodes.length);
   var it = 0;
-  while(it < nodes.length) {
+  while (it < nodes.length) {
     visited[it] = false;
     g[it] = undefined;
     it++;
@@ -38,51 +39,51 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   pq.push([startNode, 0]);
   g[startNode] = 0;
 
-  while(!pq.isEmpty()) {
-
+  while (!pq.isEmpty()) {
     currNode = pq.pop()[0];
 
-    if(currNode === endNode) {
+    if (currNode === endNode) {
       break;
-    }
-    else if (visited[currNode] === true) {
+    } else if (visited[currNode] === true) {
       continue;
     }
 
     visited[currNode] = true;
 
     //console.log(nodes[currNode].adjacencies);
-    if(typeof(nodes[currNode].adjacencies) === 'number') {
+    if (typeof nodes[currNode].adjacencies === "number") {
       nodes[currNode].adjacencies = nodes[currNode].adjacencies.toString();
     }
-    let adj = nodes[currNode].adjacencies.split('-')
-    adj = adj.map(Number)
-    for(var i=0; i<adj.length; i++) {
-
-      neighborEdge = edges.findIndex(element => element.index === adj[i]);
-      neighborId = (nodes[currNode].id === edges[neighborEdge].start_id ? edges[neighborEdge].end_id : edges[neighborEdge].start_id);
-      neighbor = nodes.findIndex(element => element.id === neighborId);
+    let adj = nodes[currNode].adjacencies.split("-");
+    adj = adj.map(Number);
+    for (var i = 0; i < adj.length; i++) {
+      neighborEdge = adj[i];
+      neighborId =
+        nodes[currNode].id === edges[neighborEdge].start_id
+          ? edges[neighborEdge].end_id
+          : edges[neighborEdge].start_id;
+      neighbor = nodeIdToIndex[neighborId]; //nodes.findIndex(element => element.id === neighborId);
 
       currW = edgeScore(edges[neighborEdge], safetyParams);
-      if(g[neighbor] === undefined || g[currNode] + currW < g[neighbor]) {
+      if (g[neighbor] === undefined || g[currNode] + currW < g[neighbor]) {
         g[neighbor] = g[currNode] + currW;
-        pq.push([neighbor, g[neighbor] + heuristic(nodes[neighbor], nodes[endNode])]);
+        pq.push([
+          neighbor,
+          g[neighbor] + heuristic(nodes[neighbor], nodes[endNode])
+        ]);
         nodes[neighbor].prev = currNode; // prev stores index in array seems fine
       }
-
     }
-
   }
 
   // now construct the list of waypoints
-  let path = []
+  let path = [];
   if (g[endNode] === undefined) {
     // this is either because start === end or there is no path
     // TODO: what to do if there is no path (can this even happen)
-  }
-  else {
+  } else {
     curr = endNode;
-    while(curr !== startNode) {
+    while (curr !== startNode) {
       path.push({
         latitude: nodes[curr].latitude,
         longitude: nodes[curr].longitude
@@ -92,13 +93,14 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
     path.push({
       latitude: nodes[startNode].latitude,
       longitude: nodes[startNode].longitude
-    })
+    });
     path.reverse();
   }
 
-  if(path.length > 0) { // need to remove some waypoints
+  if (path.length > 0) {
+    // need to remove some waypoints
     path = removeUnnecessary(path);
-    if(path.length > 23) {
+    if (path.length > 23) {
       // TODO: ?
     }
   }
@@ -109,7 +111,8 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   };
 };
 
-function heuristic(node, end) { // given as node object; computes euclidean distance
+function heuristic(node, end) {
+  // given as node object; computes euclidean distance
   const start_lat = node.latitude;
   const start_lon = node.longitude;
   const end_lat = end.latitude;
@@ -120,31 +123,31 @@ function heuristic(node, end) { // given as node object; computes euclidean dist
   return Math.sqrt(latD * latD + lonD * lonD);
 }
 
-function removeUnnecessary(path) { // array of waypoints + start and end coordinates
+function removeUnnecessary(path) {
+  // array of waypoints + start and end coordinates
   let fullPath = path.slice();
   let i = 1;
-  while(i < fullPath.length - 1){
+  while (i < fullPath.length - 1) {
     // check if i-1, i, i+1 form a straight enough line
     const a = {
-      x: fullPath[i].latitude - fullPath[i-1].latitude,
-      y: fullPath[i].longitude - fullPath[i-1].longitude
+      x: fullPath[i].latitude - fullPath[i - 1].latitude,
+      y: fullPath[i].longitude - fullPath[i - 1].longitude
     };
     const b = {
-      x: fullPath[i].latitude - fullPath[i+1].latitude,
-      y: fullPath[i].longitude - fullPath[i+1].longitude
+      x: fullPath[i].latitude - fullPath[i + 1].latitude,
+      y: fullPath[i].longitude - fullPath[i + 1].longitude
     };
     const dotProd = a.x * b.x + a.y * b.y;
     const distA = Math.sqrt(a.x * a.x + a.y * a.y);
     const distB = Math.sqrt(b.x * b.x + b.y * b.y);
-    let currAng = Math.acos((dotProd)/(distA * distB));
-    if(currAng > Math.PI/2) currAng = Math.PI - currAng;
+    let currAng = Math.acos(dotProd / (distA * distB));
+    if (currAng > Math.PI / 2) currAng = Math.PI - currAng;
     //console.log(currAng * 180 / Math.PI);
-    if(currAng <= ANG){
+    if (currAng <= ANG) {
       // remove node i from the array
       fullPath.splice(i, 1);
       // don't increment i
-    }
-    else{
+    } else {
       i++;
     }
   }
