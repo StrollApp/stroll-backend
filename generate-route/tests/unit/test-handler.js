@@ -104,4 +104,67 @@ describe("query to /generate-route lambda function", function () {
     };
     await testQuery(query);
   });
+
+  it("4) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          // peoples park test
+          start: {
+            latitude: 37.8662019598997,
+            longitude: -122.25470066070557
+          },
+          end: {
+            latitude: 37.86866240734136,
+            longitude: -122.2628116607666
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("5) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          // peoples park test
+          start: {
+            latitude: 37.8662019598997,
+            longitude: -122.25470066070557
+          },
+          end: {
+            latitude: 37.88102692319533,
+            longitude: -122.26441025733948
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("6) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          // peoples park test
+          start: {
+            latitude: 37.894904889845144,
+            longitude: -122.28195190429686
+          },
+          end: {
+            latitude: 37.84910360472934,
+            longitude: -122.27105140686035
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
 });

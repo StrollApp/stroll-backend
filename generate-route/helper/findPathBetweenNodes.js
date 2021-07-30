@@ -6,7 +6,7 @@
 var PriorityQueue = require("./priorityQueue.js");
 const edgeScore = require("./edgeScore.js");
 const nodeIdToIndex = require("../nodeIdToIndex.json");
-const ANG = (5 * Math.PI) / 180; // maximum amt of degrees which we consider "straight line"
+const ANG = (40 * Math.PI) / 180; // maximum amt of degrees which we consider "straight line"
 const cos = 0.789328039;
 const degree = 69.1694444;
 const ftPerMile = 5280;
@@ -113,10 +113,17 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
 function heuristic(node, end) {
   // given as node object; computes euclidean distance
-  const start_lat = node.latitude;
-  const start_lon = node.longitude;
-  const end_lat = end.latitude;
-  const end_lon = end.longitude;
+  return euclideanDistance(node, end);
+}
+
+// returns in feet distance between points a and b
+// where a and b are both objects containing a longitude
+// and latitude field
+function euclideanDistance(a, b) {
+  const start_lat = a.latitude;
+  const start_lon = a.longitude;
+  const end_lat = b.latitude;
+  const end_lon = b.longitude;
 
   latD = (end_lat - start_lat) * degree * ftPerMile;
   lonD = (end_lon - start_lon) * cos * degree * ftPerMile;
@@ -124,6 +131,12 @@ function heuristic(node, end) {
 }
 
 function removeUnnecessary(path) {
+  var res = removeClutteredPoints(path);
+  res = removeStraightPoints(res);
+  return res;
+}
+
+function removeStraightPoints(path) {
   // array of waypoints + start and end coordinates
   let fullPath = path.slice();
   let i = 1;
@@ -152,4 +165,25 @@ function removeUnnecessary(path) {
     }
   }
   return fullPath;
+}
+
+function removeClutteredPoints(path) {
+  let res = [];
+  var left = 0;
+  var right = 1;
+  while (right < path.length) {
+    if (euclideanDistance(path[left], path[right]) < 200) {
+      right++;
+    }
+    else {
+      res.push(path[left]);
+      left = right;
+      right++;
+    }
+  }
+  res.push(path[left]);
+  if (left != path.length - 1) {
+    res.push(path[path.length - 1]);
+  }
+  return res;
 }
