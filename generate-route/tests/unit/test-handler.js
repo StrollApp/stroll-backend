@@ -86,7 +86,7 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("3) should return valid response on query", async () => {
+  it("3) path going through people's park", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
@@ -107,12 +107,11 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("4) should return valid response on query", async () => {
+  it("4) path going from unit 2 to RSF", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
         points: {
-          // peoples park test
           start: {
             latitude: 37.8662019598997,
             longitude: -122.25470066070557
@@ -128,12 +127,12 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("5) should return valid response on query", async () => {
+  it("5) path going from unit 2 to somewhere north of campus", async () => {
+    return;
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
         points: {
-          // peoples park test
           start: {
             latitude: 37.8662019598997,
             longitude: -122.25470066070557
@@ -149,12 +148,11 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("6) should return valid response on query", async () => {
+  it("6) path from S. tip of Berkeley to N. tip of Berkeley", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
         points: {
-          // peoples park test
           start: {
             latitude: 37.894904889845144,
             longitude: -122.28195190429686
@@ -170,12 +168,11 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("7) should return valid response on query", async () => {
+  it("7) path from SW tip of Berkeley to NE tip of Berkeley", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
         points: {
-          // peoples park test
           start: {
             latitude: 37.84926456884684,
             longitude: -122.29658603668211
