@@ -5,6 +5,10 @@
 
 var PriorityQueue = require("./priorityQueue.js");
 const edgeScore = require("./edgeScore.js");
+const ANG = 5 * Math.PI / 180; // maximum amt of degrees which we consider "straight line"
+const cos = 0.789328039;
+const degree = 69.1694444;
+const ftPerMile = 5280;
 
 module.exports = function (graph, startNode, endNode, safetyParams) {
   // this assumes startnode and endnode are indices for the node array in the graph
@@ -106,17 +110,10 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 };
 
 function heuristic(node, end) { // given as node object; computes euclidean distance
-  s_lat = 37.84369; n_lat = 37.91079;
-  avg_lat = (s_lat + n_lat)/2;
-
-  start_lat = node.latitude;
-  start_lon = node.longitude;
-  end_lat = end.latitude;
-  end_lon = end.longitude;
-
-  cos = Math.cos(avg_lat * Math.PI / 180)
-  degree = 69.1694444;
-  ftPerMile = 5280;
+  const start_lat = node.latitude;
+  const start_lon = node.longitude;
+  const end_lat = end.latitude;
+  const end_lon = end.longitude;
 
   latD = (end_lat - start_lat) * degree * ftPerMile;
   lonD = (end_lon - start_lon) * cos * degree * ftPerMile;
@@ -124,7 +121,6 @@ function heuristic(node, end) { // given as node object; computes euclidean dist
 }
 
 function removeUnnecessary(path) { // array of waypoints + start and end coordinates
-  const ANG = 1 * Math.PI / 180; // maximum amt of degrees which we consider "straight line"
   let fullPath = path.slice();
   let i = 1;
   while(i < fullPath.length - 1){

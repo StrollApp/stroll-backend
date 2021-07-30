@@ -57,23 +57,55 @@ exports.lambdaHandler = async (event, context) => {
     const startLocation = startParams.location;
     const endEdge = endParams.edge;
     const endLocation = endParams.location;
-    const startNode0 = nodes.findIndex(element => element.id === startEdge.start_id);
-    const startNode1 = nodes.findIndex(element => element.id === startEdge.end_id);
-    const endNode0 = nodes.findIndex(element => element.id === endEdge.start_id);
+    const startNode0 = nodes.findIndex(
+      element => element.id === startEdge.start_id
+    );
+    const startNode1 = nodes.findIndex(
+      element => element.id === startEdge.end_id
+    );
+    const endNode0 = nodes.findIndex(
+      element => element.id === endEdge.start_id
+    );
     const endNode1 = nodes.findIndex(element => element.id === endEdge.end_id);
 
     const startEdgeDist = edgeScore(startEdge, safetyParams);
     const endEdgeDist = edgeScore(endEdge, safetyParams);
 
-    const result00 = findPathBetweenNodes(graph, startNode0, endNode0, safetyParams);
-    const result01 = findPathBetweenNodes(graph, startNode0, endNode1, safetyParams);
-    const result10 = findPathBetweenNodes(graph, startNode1, endNode0, safetyParams);
-    const result11 = findPathBetweenNodes(graph, startNode1, endNode1, safetyParams);
+    const result00 = findPathBetweenNodes(
+      graph,
+      startNode0,
+      endNode0,
+      safetyParams
+    );
+    const result01 = findPathBetweenNodes(
+      graph,
+      startNode0,
+      endNode1,
+      safetyParams
+    );
+    const result10 = findPathBetweenNodes(
+      graph,
+      startNode1,
+      endNode0,
+      safetyParams
+    );
+    const result11 = findPathBetweenNodes(
+      graph,
+      startNode1,
+      endNode1,
+      safetyParams
+    );
     const dists = [
-      startEdgeDist * startLocation + result00.dist + endEdgeDist * endLocation, 
-      startEdgeDist * startLocation + result01.dist + endEdgeDist * (1 - endLocation), 
-      startEdgeDist * (1 - startLocation) + result10.dist + endEdgeDist * endLocation, 
-      startEdgeDist * (1 - startLocation) + result11.dist + endEdgeDist * (1 - endLocation)
+      startEdgeDist * startLocation + result00.dist + endEdgeDist * endLocation,
+      startEdgeDist * startLocation +
+        result01.dist +
+        endEdgeDist * (1 - endLocation),
+      startEdgeDist * (1 - startLocation) +
+        result10.dist +
+        endEdgeDist * endLocation,
+      startEdgeDist * (1 - startLocation) +
+        result11.dist +
+        endEdgeDist * (1 - endLocation)
     ];
     var index = 0;
     var min = Number.MAX_VALUE;
@@ -84,30 +116,24 @@ exports.lambdaHandler = async (event, context) => {
       }
     }
 
-    var path;
-    if (index === 0) {
-      path = result00.path;
-    }
-    else if (index === 1) {
-      path = result01.path;
-    }
-    else if (index === 2) {
-      path = result10.path;
-    }
-    else if (index === 3) {
-      path = result11.path;
-    }
+    var possiblePaths = [
+      result00.path,
+      result01.path,
+      result10.path,
+      result11.path
+    ];
+    var path = possiblePaths[index];
 
     // TODO: do shit with the path and the endpoints
 
-/* after findClosestEdgeToPoint is done use this:
+    /* after findClosestEdgeToPoint is done use this:
     const startEdge = findClosestEdgeToPoint(graph, start); // this should return an index...
     const endEdge = findClosestEdgeToPoint(graph, end);
     // look at each endpoint on edge and find closest paths
     const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
 */
 
-/* budu test
+    /* budu test
     let path = findPathBetweenNodes(graph, 5088, 5093, safetyParams);
     //console.log(path.dist)
     path = path.path;*/

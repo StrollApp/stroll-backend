@@ -6,71 +6,102 @@ const expect = chai.expect;
 
 const getRouteURL = require("../../helper/googleMapsLinkGenerator");
 
+// test a given query
+const testQuery = async query => {
+  const result = await app.lambdaHandler(query, {});
+  expect(result).to.be.an("object");
+  expect(result.statusCode).to.equal(200);
+
+  let response = JSON.parse(result.body);
+  expect(response).to.be.an("object");
+  expect(response).to.have.property("route");
+  expect(response.route).to.be.an("object");
+
+  let route = response.route;
+  expect(route).to.have.property("start");
+  expect(route).to.have.property("waypoints");
+  expect(route).to.have.property("end");
+
+  const { start, waypoints, end } = route;
+
+  const points = [start, ...waypoints, end];
+  points.forEach(point => {
+    expect(point).to.have.property("longitude");
+    expect(point).to.have.property("latitude");
+    expect(point.longitude).to.be.an("number");
+    expect(point.latitude).to.be.an("number");
+  });
+
+  const link = getRouteURL(start, waypoints, end);
+  console.log(
+    ` The original route would have been https://www.google.com/maps/dir/${start.latitude},${start.longitude}/${end.latitude},${end.longitude}/data=!4m2!4m1!3e2`
+  );
+  console.log(
+    `   The result can be inspected with the following Google Maps link ${link}\n\n\n`
+  );
+};
+
 describe("query to /generate-route lambda function", function () {
-  it("should return valid response on valid input", async () => {
+  it("1) should return valid response on query", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
         points: {
           // original unit test:
-          /*start: {
+          start: {
             longitude: -122.26100921630858,
             latitude: 37.86726491715302
           },
           end: {
             longitude: -122.26530075073242,
             latitude: 37.86997517701081
-          }*/
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("2) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
           // budu unit test:
-          /*start: {
+          start: {
             longitude: -122.2759143292285,
-            latitude: 37.884688478564016,
+            latitude: 37.884688478564016
           },
           end: {
             longitude: -122.28257650112171,
             latitude: 37.88888613298019
-          }*/
+          }
+        },
+        safetyParams: ["crime", "streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("3) should return valid response on query", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
           // peoples park test
           start: {
-            latitude: 37.86657697036694, 
+            latitude: 37.86657697036694,
             longitude: -122.25407911520239
           },
           end: {
-            latitude: 37.86545734582157, 
+            latitude: 37.86545734582157,
             longitude: -122.26316730880775
           }
         },
         safetyParams: ["crime", "streetLights"]
       })
     };
-
-    const result = await app.lambdaHandler(query, {});
-    expect(result).to.be.an("object");
-    expect(result.statusCode).to.equal(200);
-
-    let response = JSON.parse(result.body);
-    expect(response).to.be.an("object");
-    expect(response).to.have.property("route");
-    expect(response.route).to.be.an("object");
-
-    let route = response.route;
-    expect(route).to.have.property("start");
-    expect(route).to.have.property("waypoints");
-    expect(route).to.have.property("end");
-
-    const { start, waypoints, end } = route;
-
-    const points = [start, ...waypoints, end];
-    points.forEach(point => {
-      expect(point).to.have.property("longitude");
-      expect(point).to.have.property("latitude");
-      expect(point.longitude).to.be.an("number");
-      expect(point.latitude).to.be.an("number");
-    });
-
-    const link = getRouteURL(start, waypoints, end);
-    console.log(
-      `   The result can be inspected with the following Google Maps link ${link}`
-    );
+    await testQuery(query);
   });
 });

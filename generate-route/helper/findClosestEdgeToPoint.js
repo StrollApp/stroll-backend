@@ -1,8 +1,8 @@
 // given a graph, and a point with a longitude and latitude property
 // find the node closest to it on the graph and return it
-module.exports = function (graph, point) {
-  const { longitude, latitude } = point;
+const cos = 0.789328039;
 
+module.exports = function (graph, point) {
   // TODO: Complete this implementation
   edges = graph.edges.slice();
   var len = edges.length;
@@ -29,7 +29,6 @@ function findSquareDistanceToEdge(point, edge) {
     var start_lon = edge.start_lon;
     var end_lat = edge.end_lat;
     var end_lon = edge.end_lon;
-    const cos = 0.789328039;
     lon *= cos;
     start_lon *= cos;
     end_lon *= cos;
@@ -53,7 +52,6 @@ function findSquareDistanceToEdge(point, edge) {
 }
 
 function findDistanceToCoords(point, lat, lon) {
-    const cos = 0.789328039;
     var point_lat = point.latitude;
     var point_lon = point.longitude;
     point_lon *= cos;
