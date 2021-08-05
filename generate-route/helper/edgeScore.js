@@ -1,5 +1,5 @@
 module.exports = function edgeScore (edge, safetyParams) { // edge is an edge object, safetyparam is array of strings
-  const LIGHT_COEFF = 1;
+  const LIGHT_COEFF = 1/20;
   const CRIME_COEFF = 8/45;
   // notes: max lights = 30, max crime = 105 !
   
@@ -17,8 +17,8 @@ module.exports = function edgeScore (edge, safetyParams) { // edge is an edge ob
 }
 
 function lightScore(edge) {
-  lightRatio = edge.light_count / edge.distance;
-  return 0;
+  const lightRatio = edge.light_count / edge.distance;
+  return Math.max(0, 1 - 50 * lightRatio);
 }
 
 function crimeScore(edge) {

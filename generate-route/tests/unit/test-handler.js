@@ -184,4 +184,64 @@ describe("query to /generate-route lambda function", function () {
     };
     await testQuery(query);
   });
+
+  it("8) path from S. tip of Berkeley to N. tip of Berkeley (street lights only)", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          start: {
+            latitude: 37.894904889845144,
+            longitude: -122.28195190429686
+          },
+          end: {
+            latitude: 37.84910360472934,
+            longitude: -122.27105140686035
+          }
+        },
+        safetyParams: ["streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("9) path from SW tip of Berkeley to NE tip of Berkeley (street lights only)", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          start: {
+            latitude: 37.84926456884684,
+            longitude: -122.29658603668211
+          },
+          end: {
+            latitude: 37.90206723405876,
+            longitude: -122.26727485656738
+          }
+        },
+        safetyParams: ["streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
+
+  it("10) offset path from SW tip of Berkeley to NE tip of Berkeley (street lights only)", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          start: {
+            latitude: 37.850004862706705,
+            longitude: -122.27608874722878
+          },
+          end: {
+            latitude: 37.88629074736004,
+            longitude: -122.28377570657851
+          }
+        },
+        safetyParams: ["streetLights"]
+      })
+    };
+    await testQuery(query);
+  });
 });
