@@ -1,6 +1,6 @@
 module.exports = function edgeScore (edge, safetyParams) { // edge is an edge object, safetyparam is array of strings
   const LIGHT_COEFF = 1;
-  const CRIME_COEFF = 4/45;
+  const CRIME_COEFF = 8/45;
   // notes: max lights = 30, max crime = 105 !
   
   let light = 0;

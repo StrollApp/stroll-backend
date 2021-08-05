@@ -42,8 +42,7 @@ const testQuery = async query => {
 };
 
 describe("query to /generate-route lambda function", function () {
-  it("1) should return valid response on query", async () => {
-    return;
+  it("1) should return valid response on query, basic sanity check", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
@@ -64,8 +63,7 @@ describe("query to /generate-route lambda function", function () {
     await testQuery(query);
   });
 
-  it("2) should return valid response on query", async () => {
-    return;
+  it("2) should return valid response on query, basic sanity check", async () => {
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
@@ -128,7 +126,6 @@ describe("query to /generate-route lambda function", function () {
   });
 
   it("5) path going from unit 2 to somewhere north of campus", async () => {
-    return;
     // set up query object to send to function
     const query = {
       body: JSON.stringify({
