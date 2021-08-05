@@ -10,7 +10,7 @@ module.exports = function (graph, point) {
   var min_index = 0;
   for (var i = 0; i < len; i++) {
     distance = findSquareDistanceToEdge(point, edges[i]);
-    if (distance < min_value) {
+    if (distance < min_value && edges[i].component == 0) {
         min_value = distance;
         min_index = i;
     }
