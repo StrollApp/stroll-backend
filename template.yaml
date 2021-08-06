@@ -49,6 +49,7 @@ Resources:
       CodeUri: generate-route/
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
+      Timeout: 100
       Events:
         Gateway:
           Type: HttpApi
