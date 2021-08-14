@@ -244,4 +244,24 @@ describe("query to /generate-route lambda function", function () {
     };
     await testQuery(query);
   });
+
+  it("11) u2 to Westbrae Biergarten", async () => {
+    // set up query object to send to function
+    const query = {
+      body: JSON.stringify({
+        points: {
+          start: {
+            latitude: 37.866116,
+            longitude: -122.254641
+          },
+          end: {
+            latitude: 37.88141084489236,
+            longitude: -122.2901820409468
+          }
+        },
+        safetyParams: ["crime"]
+      })
+    };
+    await testQuery(query);
+  });
 });
