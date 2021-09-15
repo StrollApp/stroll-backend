@@ -18,15 +18,15 @@ Resources:
   AuthGatewayHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      Auth:
-        Authorizers:
-          FirebaseAuthorizer:
-            IdentitySource: $request.header.Authorization
-            JwtConfiguration:
-              audience:
-                - !Ref FirebaseProjectId
-              issuer: !Sub https://securetoken.google.com/${FirebaseProjectId}
-        DefaultAuthorizer: FirebaseAuthorizer
+      # Auth:
+      #   Authorizers:
+      #     FirebaseAuthorizer:
+      #       IdentitySource: $request.header.Authorization
+      #       JwtConfiguration:
+      #         audience:
+      #           - !Ref FirebaseProjectId
+      #         issuer: !Sub https://securetoken.google.com/${FirebaseProjectId}
+      #   DefaultAuthorizer: FirebaseAuthorizer
       StageName: "Prod"
 
   HelloWorldFunction:
