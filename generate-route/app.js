@@ -49,8 +49,6 @@ exports.lambdaHandler = async (event, context) => {
     }
     (and similar for edges)
     */
-    // const nodes = graph.nodes.slice();
-    const nodes = { ...indexedNodes };
 
     const startParams = findClosestEdgeToPoint(graph, start);
     const endParams = findClosestEdgeToPoint(graph, end);
@@ -63,7 +61,6 @@ exports.lambdaHandler = async (event, context) => {
     const startNode1 = startEdge.end_id;
     const endNode0 = endEdge.start_id;
     const endNode1 = endEdge.end_id;
-    // console.log(startNode0, startNode1, endNode0, endNode1);
 
     const startEdgeDist = edgeScore(startEdge, safetyParams);
     const endEdgeDist = edgeScore(endEdge, safetyParams);
@@ -92,6 +89,7 @@ exports.lambdaHandler = async (event, context) => {
       endNode1,
       safetyParams
     );
+
     const dists = [
       startEdgeDist * startLocation + result00.dist + endEdgeDist * endLocation,
       startEdgeDist * startLocation +
@@ -104,14 +102,6 @@ exports.lambdaHandler = async (event, context) => {
         result11.dist +
         endEdgeDist * (1 - endLocation)
     ];
-    var index = 0;
-    var min = Number.MAX_VALUE;
-    for (var i = 0; i < 4; i++) {
-      if (dists[i] < min) {
-        min = dists[i];
-        index = i;
-      }
-    }
 
     var possiblePaths = [
       result00.path,
@@ -119,21 +109,8 @@ exports.lambdaHandler = async (event, context) => {
       result10.path,
       result11.path
     ];
+    const index = dists.indexOf(Math.min(...dists));
     var path = possiblePaths[index];
-
-    // TODO: do shit with the path and the endpoints
-
-    /* after findClosestEdgeToPoint is done use this:
-    const startEdge = findClosestEdgeToPoint(graph, start); // this should return an index...
-    const endEdge = findClosestEdgeToPoint(graph, end);
-    // look at each endpoint on edge and find closest paths
-    const path = findPathBetweenNodes(graph, startNode, endNode, safetyParams);
-*/
-
-    /* budu test
-    let path = findPathBetweenNodes(graph, 5088, 5093, safetyParams);
-    //console.log(path.dist)
-    path = path.path;*/
 
     // generate return route
     const route = {

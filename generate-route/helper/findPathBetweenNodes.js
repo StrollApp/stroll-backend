@@ -1,8 +1,3 @@
-// given the graph, a start, an end point (each with a longitude and latitude property), and
-// a string array of safetyParams find a path that get you from one to the other in the safest
-// manner
-// return the path, including the start and end points
-
 var PriorityQueue = require("./priorityQueue.js");
 const edgeScore = require("./edgeScore.js");
 const ANG = (40 * Math.PI) / 180; // maximum amt of degrees which we consider "straight line"
@@ -10,25 +5,21 @@ const cos = 0.789328039;
 const degree = 69.1694444;
 const ftPerMile = 5280;
 
+// given the graph, a start, an end point (each with a longitude and latitude property), and a string array of safetyParams
+// find a path that get you from one to the other in the safest manner
+// return the path, including the start and end points
 module.exports = function (graph, startNode, endNode, safetyParams) {
   // this assumes startnode and endnode are ids for the node array in the graph
-
-  // this assumes all the regions bs is taken care of already
-  // heuristic will be euclidean distance using lat/lon
   // TODO: implement thing to penalize turns
-  // TODO: implement edgeScore; need to make sure lights dont make things negative or < 1 even
-  // TODO: remove unecessary waypoints (>=3 forming a very straight segment)
 
-  const pq = new PriorityQueue((a, b) => a[1] < b[1]); // push stuff as [node object INDEX (in the array), priority]
+  const pq = new PriorityQueue((a, b) => a[1] < b[1]); // push stuff as [node object INDEX, priority]
   const nodes = { ...graph.nodes };
   const edges = graph.edges.slice();
 
-  // make arrays to store visited and g
+  // make maps to store visited and g
   var visited = {};
   var g = {};
   var prev = {};
-
-  // g = cost, h = heuristic, f = g+h
 
   pq.push([startNode, 0]);
   g[startNode] = 0;
@@ -38,13 +29,13 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
     if (currNode === endNode) {
       break;
-    } else if (visited[currNode] === true) {
+    }
+    if (visited[currNode] === true) {
       continue;
     }
 
     visited[currNode] = true;
 
-    //console.log(nodes[currNode].adjacencies);
     if (typeof nodes[currNode].adjacencies === "number") {
       nodes[currNode].adjacencies = nodes[currNode].adjacencies.toString();
     }
@@ -61,43 +52,38 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
       if (g[neighbor] === undefined || g[currNode] + currW < g[neighbor]) {
         g[neighbor] = g[currNode] + currW;
-        pq.push([
-          neighbor,
-          g[neighbor] + heuristic(nodes[neighbor], nodes[endNode])
-        ]);
-        prev[neighbor] = currNode; // prev stores index in array seems fine
+        prev[neighbor] = currNode;
+
+        const priority =
+          g[neighbor] + heuristic(nodes[neighbor], nodes[endNode]);
+        pq.push([neighbor, priority]);
       }
     });
   }
 
-  // now construct the list of waypoints
+  // construct the list of waypoints
   let path = [];
-  if (g[endNode] === undefined) {
-    // this is either because start === end or there is no path
-    // TODO: what to do if there is no path (can this even happen)
-  } else {
-    var curr = endNode;
-    while (curr !== startNode) {
-      path.push({
-        latitude: nodes[curr].latitude,
-        longitude: nodes[curr].longitude
-      });
-      curr = prev[curr];
-    }
+  var curr = endNode;
+
+  while (curr !== startNode) {
     path.push({
-      latitude: nodes[startNode].latitude,
-      longitude: nodes[startNode].longitude
+      latitude: nodes[curr].latitude,
+      longitude: nodes[curr].longitude
     });
-    path.reverse();
+    curr = prev[curr];
   }
 
-  if (path.length > 0) {
-    // need to remove some waypoints
-    path = removeUnnecessary(path);
-    if (path.length > 23) {
-      // TODO: ?
-    }
-  }
+  path.push({
+    latitude: nodes[startNode].latitude,
+    longitude: nodes[startNode].longitude
+  });
+
+  path.reverse();
+
+  // need to remove some waypoints
+  path = removeUnnecessary(path);
+
+  // TODO: handle paths with more than 23 waypoints
 
   return {
     path: path,
@@ -110,9 +96,8 @@ function heuristic(node, end) {
   return euclideanDistance(node, end);
 }
 
-// returns in feet distance between points a and b
-// where a and b are both objects containing a longitude
-// and latitude field
+// returns in feet distance between points a and b where
+// a and b are both objects containing a longitude and latitude field
 function euclideanDistance(a, b) {
   const start_lat = a.latitude;
   const start_lon = a.longitude;
@@ -125,6 +110,7 @@ function euclideanDistance(a, b) {
 }
 
 function removeUnnecessary(path) {
+  if (path.length < 1) return path;
   var res = removeClutteredPoints(path);
   res = removeStraightPoints(res);
   return res;
@@ -148,8 +134,9 @@ function removeStraightPoints(path) {
     const distA = Math.sqrt(a.x * a.x + a.y * a.y);
     const distB = Math.sqrt(b.x * b.x + b.y * b.y);
     let currAng = Math.acos(dotProd / (distA * distB));
+
     if (currAng > Math.PI / 2) currAng = Math.PI - currAng;
-    //console.log(currAng * 180 / Math.PI);
+
     if (currAng <= ANG) {
       // remove node i from the array
       fullPath.splice(i, 1);
@@ -165,6 +152,7 @@ function removeClutteredPoints(path) {
   let res = [];
   var left = 0;
   var right = 1;
+
   while (right < path.length) {
     if (euclideanDistance(path[left], path[right]) < 200) {
       right++;
@@ -174,7 +162,9 @@ function removeClutteredPoints(path) {
       right++;
     }
   }
+
   res.push(path[left]);
+
   if (left != path.length - 1) {
     res.push(path[path.length - 1]);
   }
