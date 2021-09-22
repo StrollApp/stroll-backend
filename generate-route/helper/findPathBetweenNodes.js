@@ -5,14 +5,13 @@
 
 var PriorityQueue = require("./priorityQueue.js");
 const edgeScore = require("./edgeScore.js");
-const nodeIdToIndex = require("../nodeIdToIndex.json");
 const ANG = (40 * Math.PI) / 180; // maximum amt of degrees which we consider "straight line"
 const cos = 0.789328039;
 const degree = 69.1694444;
 const ftPerMile = 5280;
 
 module.exports = function (graph, startNode, endNode, safetyParams) {
-  // this assumes startnode and endnode are indices for the node array in the graph
+  // this assumes startnode and endnode are ids for the node array in the graph
 
   // this assumes all the regions bs is taken care of already
   // heuristic will be euclidean distance using lat/lon
@@ -21,18 +20,13 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
   // TODO: remove unecessary waypoints (>=3 forming a very straight segment)
 
   const pq = new PriorityQueue((a, b) => a[1] < b[1]); // push stuff as [node object INDEX (in the array), priority]
-  const nodes = graph.nodes.slice();
+  const nodes = { ...graph.nodes };
   const edges = graph.edges.slice();
 
   // make arrays to store visited and g
-  const visited = new Array(nodes.length);
-  const g = new Array(nodes.length);
-  var it = 0;
-  while (it < nodes.length) {
-    visited[it] = false;
-    g[it] = undefined;
-    it++;
-  }
+  var visited = {};
+  var g = {};
+  var prev = {};
 
   // g = cost, h = heuristic, f = g+h
 
@@ -56,24 +50,24 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
     }
     let adj = nodes[currNode].adjacencies.split("-");
     adj = adj.map(Number);
-    for (var i = 0; i < adj.length; i++) {
-      neighborEdge = adj[i];
-      neighborId =
-        nodes[currNode].id === edges[neighborEdge].start_id
+
+    adj.forEach(neighborEdge => {
+      neighbor =
+        currNode === edges[neighborEdge].start_id
           ? edges[neighborEdge].end_id
           : edges[neighborEdge].start_id;
-      neighbor = nodeIdToIndex[neighborId]; //nodes.findIndex(element => element.id === neighborId);
 
       currW = edgeScore(edges[neighborEdge], safetyParams);
+
       if (g[neighbor] === undefined || g[currNode] + currW < g[neighbor]) {
         g[neighbor] = g[currNode] + currW;
         pq.push([
           neighbor,
           g[neighbor] + heuristic(nodes[neighbor], nodes[endNode])
         ]);
-        nodes[neighbor].prev = currNode; // prev stores index in array seems fine
+        prev[neighbor] = currNode; // prev stores index in array seems fine
       }
-    }
+    });
   }
 
   // now construct the list of waypoints
@@ -82,13 +76,13 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
     // this is either because start === end or there is no path
     // TODO: what to do if there is no path (can this even happen)
   } else {
-    curr = endNode;
+    var curr = endNode;
     while (curr !== startNode) {
       path.push({
         latitude: nodes[curr].latitude,
         longitude: nodes[curr].longitude
       });
-      curr = nodes[curr].prev;
+      curr = prev[curr];
     }
     path.push({
       latitude: nodes[startNode].latitude,
@@ -174,8 +168,7 @@ function removeClutteredPoints(path) {
   while (right < path.length) {
     if (euclideanDistance(path[left], path[right]) < 200) {
       right++;
-    }
-    else {
+    } else {
       res.push(path[left]);
       left = right;
       right++;

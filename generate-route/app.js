@@ -8,7 +8,7 @@ const edgeScore = require("./helper/edgeScore");
 
 // import graph data
 const edgeArray = require("./edges.json");
-const nodeArray = require("./nodes.json");
+const indexedNodes = require("./indexedNodes.json");
 
 /**
  *
@@ -32,11 +32,11 @@ exports.lambdaHandler = async (event, context) => {
     // solve for route
     const graph = {
       edges: edgeArray,
-      nodes: nodeArray
+      nodes: indexedNodes
     };
     /* contains an array of edge objects and an array of node objects
     {
-      edges: []
+      edges: [],
       nodes: []
     }
     and a node is of the form
@@ -49,7 +49,8 @@ exports.lambdaHandler = async (event, context) => {
     }
     (and similar for edges)
     */
-    const nodes = graph.nodes.slice();
+    // const nodes = graph.nodes.slice();
+    const nodes = { ...indexedNodes };
 
     const startParams = findClosestEdgeToPoint(graph, start);
     const endParams = findClosestEdgeToPoint(graph, end);
@@ -57,16 +58,12 @@ exports.lambdaHandler = async (event, context) => {
     const startLocation = startParams.location;
     const endEdge = endParams.edge;
     const endLocation = endParams.location;
-    const startNode0 = nodes.findIndex(
-      element => element.id === startEdge.start_id
-    );
-    const startNode1 = nodes.findIndex(
-      element => element.id === startEdge.end_id
-    );
-    const endNode0 = nodes.findIndex(
-      element => element.id === endEdge.start_id
-    );
-    const endNode1 = nodes.findIndex(element => element.id === endEdge.end_id);
+
+    const startNode0 = startEdge.start_id;
+    const startNode1 = startEdge.end_id;
+    const endNode0 = endEdge.start_id;
+    const endNode1 = endEdge.end_id;
+    // console.log(startNode0, startNode1, endNode0, endNode1);
 
     const startEdgeDist = edgeScore(startEdge, safetyParams);
     const endEdgeDist = edgeScore(endEdge, safetyParams);
