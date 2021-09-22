@@ -36,10 +36,7 @@ module.exports = function (graph, startNode, endNode, safetyParams) {
 
     visited[currNode] = true;
 
-    if (typeof nodes[currNode].adjacencies === "number") {
-      nodes[currNode].adjacencies = nodes[currNode].adjacencies.toString();
-    }
-    let adj = nodes[currNode].adjacencies.split("-");
+    var adj = nodes[currNode].adjacencies.split("-");
     adj = adj.map(Number);
 
     adj.forEach(neighborEdge => {
