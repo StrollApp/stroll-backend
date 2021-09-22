@@ -65,25 +65,27 @@ exports.lambdaHandler = async (event, context) => {
     const startEdgeDist = edgeScore(startEdge, safetyParams);
     const endEdgeDist = edgeScore(endEdge, safetyParams);
 
-    const result00 = findPathBetweenNodes(
+    var possiblePaths = [];
+
+    possiblePaths[0] = findPathBetweenNodes(
       graph,
       startNode0,
       endNode0,
       safetyParams
     );
-    const result01 = findPathBetweenNodes(
+    possiblePaths[1] = findPathBetweenNodes(
       graph,
       startNode0,
       endNode1,
       safetyParams
     );
-    const result10 = findPathBetweenNodes(
+    possiblePaths[2] = findPathBetweenNodes(
       graph,
       startNode1,
       endNode0,
       safetyParams
     );
-    const result11 = findPathBetweenNodes(
+    possiblePaths[3] = findPathBetweenNodes(
       graph,
       startNode1,
       endNode1,
@@ -91,26 +93,22 @@ exports.lambdaHandler = async (event, context) => {
     );
 
     const dists = [
-      startEdgeDist * startLocation + result00.dist + endEdgeDist * endLocation,
       startEdgeDist * startLocation +
-        result01.dist +
+        possiblePaths[0].dist +
+        endEdgeDist * endLocation,
+      startEdgeDist * startLocation +
+        possiblePaths[1].dist +
         endEdgeDist * (1 - endLocation),
       startEdgeDist * (1 - startLocation) +
-        result10.dist +
+        possiblePaths[2].dist +
         endEdgeDist * endLocation,
       startEdgeDist * (1 - startLocation) +
-        result11.dist +
+        possiblePaths[3].dist +
         endEdgeDist * (1 - endLocation)
     ];
 
-    var possiblePaths = [
-      result00.path,
-      result01.path,
-      result10.path,
-      result11.path
-    ];
     const index = dists.indexOf(Math.min(...dists));
-    var path = possiblePaths[index];
+    var path = possiblePaths[index].path;
 
     // generate return route
     const route = {
