@@ -1,9 +1,19 @@
 version=0.1
-[default.deploy.parameters]
- stack_name = "stroll-backend-stack"
- s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ejuw7udvcm1n"
- region = "us-west-1"
- confirm_changeset = true
- capabilities = "CAPABILITY_IAM"
- s3_prefix = "stroll-backend-stack"
+
+[test.deploy.parameters]
+region = "us-west-2"
+stack_name = "stroll-backend-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-180j9ayekwiqt"
+s3_prefix = "stroll-backend-stack"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "FirebaseProjectId=\"strll-318021\""
+ 
+[prod.deploy.parameters]
+region = "us-west-1"
+stack_name = "stroll-backend-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ejuw7udvcm1n"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+s3_prefix = "stroll-backend-stack"
 parameter_overrides = "FirebaseProjectId=\"strll-318021\""
