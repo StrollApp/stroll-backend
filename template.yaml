@@ -15,18 +15,25 @@ Parameters:
     Type: String
 
 Resources:
+  AccessLogGroup:
+      Type: AWS::Logs::LogGroup
+
   AuthGatewayHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      # Auth:
-      #   Authorizers:
-      #     FirebaseAuthorizer:
-      #       IdentitySource: $request.header.Authorization
-      #       JwtConfiguration:
-      #         audience:
-      #           - !Ref FirebaseProjectId
-      #         issuer: !Sub https://securetoken.google.com/${FirebaseProjectId}
-      #   DefaultAuthorizer: FirebaseAuthorizer
+      # AccessLogSettings:
+      #   DestinationArn: !GetAtt AccessLogGroup.Arn
+      #   Format: '{ "requestId":"$context.requestId", \
+      #         "ip": "$context.identity.sourceIp"}'
+      Auth:
+        Authorizers:
+          FirebaseAuthorizer:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              audience:
+                - !Ref FirebaseProjectId
+              issuer: !Sub https://securetoken.google.com/${FirebaseProjectId}
+        DefaultAuthorizer: FirebaseAuthorizer
       StageName: "Prod"
 
   HelloWorldFunction:
@@ -57,3 +64,7 @@ Resources:
             ApiId: !Ref AuthGatewayHttpApi
             Path: /generate-route
             Method: post
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:580247275435:layer:LambdaInsightsExtension:14"
+      Policies:
+        - CloudWatchLambdaInsightsExecutionRolePolicy
