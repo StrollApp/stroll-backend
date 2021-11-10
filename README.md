@@ -4,7 +4,7 @@
 
 To deploy updates to the production server, use
 
-``sam deploy —-config-env prod``
+``sam deploy --stack-name stroll-backend-stack --config-env prod``
 
 ## Testing Changes
 
@@ -16,4 +16,4 @@ locally,
 
 and on the server,
 
-``sam deploy —-config-env test``
+``sam deploy --stack-name stroll-backend-stack --config-env test``
