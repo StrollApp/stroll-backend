@@ -1,4 +1,6 @@
 const crimePoints = require("./data/crimeDataPoints.json");
+const streetLightPoints = require("./data/streetLightDataPoints.json");
+
 let response;
 
 /**
@@ -9,8 +11,8 @@ let response;
  *
  * @param {Object} event - contains query information
  * The event body should contain an object of the shape {"type": String}, specifying the type of
- * data being queried for heatmap generation. The string can take on "CRIME", "STREET_LIGHTS",
- * or "FOOT_TRAFFIC", though for now, it will only work for "CRIME".
+ * data being queried for heatmap generation. The string can take on "CRIME", "STREET_LIGHT",
+ * or "FOOT_TRAFFIC", though for now, it will only work for "CRIME" and "STREET_LIGHT".
  *
  * @returns [Object] array - contains array of data points
  * Each data point will have the shape {"Longitude": Number, "Latitude": Number} and optionally a
@@ -41,6 +43,9 @@ exports.lambdaHandler = async (event, context) => {
     switch (type) {
       case "CRIME":
         dataArray = crimePoints;
+        break;
+      case "STREET_LIGHT":
+        dataArray = streetLightPoints;
         break;
       default:
         break;
