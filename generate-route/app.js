@@ -28,9 +28,14 @@ exports.lambdaHandler = async (event, context) => {
     const claims = event.requestContext.authorizer.jwt.claims;
 
     // log query
-    console.log(`\n[RECEIVED ROUTE GEN QUERY]:\n` +
-      `FROM ${JSON.stringify({ id: claims.user_id, email_verified: claims.email_verified })}\n` +
-      `FOR ${event.body}`)
+    console.log(
+      `\n[RECEIVED ROUTE GEN QUERY]:\n` +
+        `FROM ${JSON.stringify({
+          id: claims.user_id,
+          email_verified: claims.email_verified
+        })}\n` +
+        `FOR ${event.body}`
+    );
 
     // extract start point, end point, and safety params
     const query = JSON.parse(event.body);
@@ -102,17 +107,17 @@ exports.lambdaHandler = async (event, context) => {
 
     const dists = [
       startEdgeDist * startLocation +
-      possiblePaths[0].dist +
-      endEdgeDist * endLocation,
+        possiblePaths[0].dist +
+        endEdgeDist * endLocation,
       startEdgeDist * startLocation +
-      possiblePaths[1].dist +
-      endEdgeDist * (1 - endLocation),
+        possiblePaths[1].dist +
+        endEdgeDist * (1 - endLocation),
       startEdgeDist * (1 - startLocation) +
-      possiblePaths[2].dist +
-      endEdgeDist * endLocation,
+        possiblePaths[2].dist +
+        endEdgeDist * endLocation,
       startEdgeDist * (1 - startLocation) +
-      possiblePaths[3].dist +
-      endEdgeDist * (1 - endLocation)
+        possiblePaths[3].dist +
+        endEdgeDist * (1 - endLocation)
     ];
 
     const index = dists.indexOf(Math.min(...dists));

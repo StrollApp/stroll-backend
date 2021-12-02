@@ -9,6 +9,8 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+    Layers:
+      - !Sub "arn:aws:lambda:${AWS::Region}:580247275435:layer:LambdaInsightsExtension:14"
 
 Parameters:
   FirebaseProjectId:
@@ -16,7 +18,7 @@ Parameters:
 
 Resources:
   AccessLogGroup:
-      Type: AWS::Logs::LogGroup
+    Type: AWS::Logs::LogGroup
 
   AuthGatewayHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -64,7 +66,22 @@ Resources:
             ApiId: !Ref AuthGatewayHttpApi
             Path: /generate-route
             Method: post
-      Layers:
-        - !Sub "arn:aws:lambda:${AWS::Region}:580247275435:layer:LambdaInsightsExtension:14"
+      Policies:
+        - CloudWatchLambdaInsightsExecutionRolePolicy
+
+  GetHeatmapDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get-heatmap-data/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Timeout: 100
+      Events:
+        Gateway:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AuthGatewayHttpApi
+            Path: /get-heatmap-data
+            Method: post
       Policies:
         - CloudWatchLambdaInsightsExecutionRolePolicy
